@@ -1,0 +1,8 @@
+model/
+*.safetensors
+__pycache__/
+.venv/
+Lib/
+Include/
+Scripts/
+pyvenv.cfg

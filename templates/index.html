@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Напиши нейтрально</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .description {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        label {
+            color: #2c3e50;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            min-height: 150px;
+            margin-bottom: 20px;
+            font-family: 'Montserrat', sans-serif;
+            resize: vertical;
+            box-sizing: border-box; /* Добавляем это свойство */
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f4f8;
+            border-radius: 8px;
+            color: #2c3e50;
+            display: none;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Перепиши нейтрально</h1>
+
+        <div class="description">
+            Этот сервис поможет исправить токсичный текст на нейтральный. Что такое токсичный текст?
+            Это текст, в котором есть оскорбления, грубые высказывания, нецензурная лексика, субъективные суждения.
+        </div>
+
+        <form id="textForm"> <!-- Уберем method="POST" -->
+            <label for="input-text">Введите токсичный текст для исправления:</label>
+            <textarea id="input-text" name="text" required></textarea>
+            <button type="submit">Отправить</button>
+        </form>
+
+        <div id="result">
+            <div class="result-title">Нейтральная версия:</div>
+            <div id="result-text"></div>
+        </div>
+    </div>
+
+
+    <script>
+        // Получаем DOM элементы один раз при загрузке
+        const form = document.getElementById('textForm');
+        const inputText = document.getElementById('input-text');
+        const resultDiv = document.getElementById('result');
+        const resultText = document.getElementById('result-text');
+
+        // Конфигурация для fetch запроса
+        const fetchConfig = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        };
+
+        // Функция обновления результата
+        const updateResult = (text) => {
+            resultText.innerHTML = text;
+            resultDiv.style.display = 'block';
+        };
+
+        // Обработчик отправки формы
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            try {
+                // Отправка запроса
+                const response = await fetch('/', {
+                    ...fetchConfig,
+                    body: JSON.stringify({ text: inputText.value })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+
+                // Обработка ответа
+                updateResult(
+                    data.error ? `Ошибка: ${data.error}` :
+                    data.paraphrases?.[0] || 'Не удалось получить результат'
+                );
+
+            } catch (error) {
+                console.error('Error:', error);
+                updateResult('Произошла ошибка при обработке запроса');
+            }
+        });
+    </script>
+</body>
+</html>
